@@ -37,7 +37,7 @@ export default function App() {
             />
             <ChatInput />
           </div>
-          <div className='col-span-3 overflow-auto h-full w-full border border-border-light rounded-xl divide-y divide-border-light'>
+          <div className='col-span-3 overflow-auto h-full w-full border border-border-light rounded-tl-xl divide-y divide-border-light'>
             <div className='flex flex-row gap-2 items-center w-full bg-canvas px-4 py-2 sticky top-0 z-10'>
               <TabGroup 
                 tabs={secondaryTabs}
