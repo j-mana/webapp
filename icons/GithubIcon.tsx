@@ -1,6 +1,7 @@
 import React from 'react';
+import BaseIcon, { BaseIconProps } from './BaseIcon';
 
-interface GithubIconProps {
+interface GithubIconProps extends Omit<BaseIconProps, 'children' | 'viewBox'> {
   size?: number;
   fill?: string;
   className?: string;
@@ -12,14 +13,7 @@ const GithubIcon: React.FC<GithubIconProps> = ({
   className 
 }) => {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 16 16" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
+    <BaseIcon size={size} className={className} viewBox="0 0 16 16">
       <g clipPath="url(#clip0_377_3324)">
         <path 
           fillRule="evenodd" 
@@ -33,7 +27,7 @@ const GithubIcon: React.FC<GithubIconProps> = ({
           <rect width="16" height="16" fill="white"/>
         </clipPath>
       </defs>
-    </svg>
+    </BaseIcon>
   );
 };
 

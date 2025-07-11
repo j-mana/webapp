@@ -1,6 +1,7 @@
 import React from 'react';
+import BaseIcon, { BaseIconProps } from './BaseIcon';
 
-interface TextInputIconProps {
+interface TextInputIconProps extends Omit<BaseIconProps, 'children' | 'viewBox'> {
   size?: number;
   fill?: string;
   className?: string;
@@ -12,14 +13,7 @@ const TextInputIcon: React.FC<TextInputIconProps> = ({
   className 
 }) => {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 12 12" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
+    <BaseIcon size={size} className={className}>
       <path 
         fillRule="evenodd" 
         clipRule="evenodd" 
@@ -30,7 +24,7 @@ const TextInputIcon: React.FC<TextInputIconProps> = ({
         d="M2.58073 3H6.5C6.77614 3 7 3.22386 7 3.5V8.5C7 8.77614 6.77614 9 6.5 9H2.58074C2.31721 9.00001 2.08975 9.00002 1.90249 8.98472C1.70482 8.96857 1.50821 8.93291 1.31902 8.83651C1.03677 8.6927 0.807302 8.46323 0.663492 8.18099C0.567095 7.9918 0.531437 7.79519 0.515286 7.59752C0.499985 7.41024 0.499992 7.18285 0.5 6.91929V5.08073C0.499992 4.81717 0.499985 4.58976 0.515286 4.40249C0.531437 4.20481 0.567095 4.0082 0.663492 3.81902C0.807302 3.53677 1.03677 3.3073 1.31902 3.16349C1.50821 3.06709 1.70482 3.03144 1.90249 3.01529C2.08977 2.99998 2.31717 2.99999 2.58073 3Z" 
         fill={fill}
       />
-    </svg>
+    </BaseIcon>
   );
 };
 

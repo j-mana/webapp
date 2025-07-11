@@ -1,6 +1,7 @@
 import React from 'react';
+import BaseIcon, { BaseIconProps } from './BaseIcon';
 
-interface PaintPourIconProps {
+interface PaintPourIconProps extends Omit<BaseIconProps, 'children' | 'viewBox'> {
   size?: number;
   fill?: string;
   className?: string;
@@ -12,14 +13,7 @@ const PaintPourIcon: React.FC<PaintPourIconProps> = ({
   className 
 }) => {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 12 12" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
+    <BaseIcon size={size} className={className}>
       <path 
         fillRule="evenodd" 
         clipRule="evenodd" 
@@ -34,7 +28,7 @@ const PaintPourIcon: React.FC<PaintPourIconProps> = ({
         d="M0.999878 10.5C0.723736 10.5 0.499878 10.7239 0.499878 11C0.499878 11.2761 0.723736 11.5 0.999878 11.5L6.99988 11.5C7.27602 11.5 7.49988 11.2761 7.49988 11C7.49988 10.7239 7.27602 10.5 6.99988 10.5L0.999878 10.5Z" 
         fill={fill}
       />
-    </svg>
+    </BaseIcon>
   );
 };
 
