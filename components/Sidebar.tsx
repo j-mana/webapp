@@ -14,11 +14,15 @@ import SearchIcon from "@/icons/SearchIcon"
 import { useUIStore } from "@/store/useUIStore"
 import Image from "next/image"
 import UserIcon from "@/icons/UserIcon"
+import { useData } from "./DataProvider"
+import Button from "./Button"
+import { createProject } from "@/lib/db-mutations"
 
 export default function Sidebar() {
   const pathname = usePathname()
   const [bookmarksExpanded, setBookmarksExpanded] = useState(true)
   const [projectsExpanded, setProjectsExpanded] = useState(true)
+  const { projects, experiments } = useData()
   
   // Calculate activeProject based on pathname
   const getActiveProjectIndex = () => {
@@ -102,18 +106,15 @@ export default function Sidebar() {
               }}
             />
           )}
-          <NestedSidebarItem 
-            icon={<SidebarIcon size={14}/>} 
-            label="On & Lowe marketing campaign" 
-            active={pathname === '/projects/1/experiments/1'}
-            href="/projects/1/experiments/1"
-          />
-          <NestedSidebarItem 
-            icon={<SidebarIcon size={14}/>} 
-            label="Italic Summer 2025" 
-            active={pathname === '/projects/1/experiments/2'}
-            href="/projects/1/experiments/2"
-          />
+          {experiments.map((experiment) => (
+            <NestedSidebarItem 
+              key={experiment.id}
+              icon={<SidebarIcon size={14}/>} 
+              label={experiment.name} 
+              active={pathname === `/projects/${experiment.project?.id}/experiments/${experiment.id}`}
+              href={`/projects/${experiment.project?.id}/experiments/${experiment.id}`}
+            />
+          ))}
         </motion.div>
       </div>
 
@@ -130,6 +131,13 @@ export default function Sidebar() {
             <ChevronDownIcon size={8} className="text-text-secondary"/>
           </motion.div>
         </button>
+
+        <Button variant="normal" className="w-full" onClick={async () => {
+          await createProject('New Project')
+        }}>
+          {/* <PlusIcon size={14}/> */}
+          New Project
+        </Button>
 
         <motion.div 
           className="flex flex-col relative"
@@ -154,24 +162,15 @@ export default function Sidebar() {
               }}
             />
           )}
-          <NestedSidebarItem 
-            icon={<SidebarIcon size={14}/>} 
-            label="Project Name" 
-            active={pathname === '/projects/1'}
-            href="/projects/1"
-          />
-          <NestedSidebarItem 
-            icon={<SidebarIcon size={14}/>} 
-            label="Project Name" 
-            active={pathname === '/projects/2'}
-            href="/projects/2"
-          />
-          <NestedSidebarItem 
-            icon={<SidebarIcon size={14}/>} 
-            label="Project Name" 
-            active={pathname === '/projects/3'}
-            href="/projects/3"
-          />
+          {projects.map((project) => (
+            <NestedSidebarItem 
+              key={project.id}
+              icon={<SidebarIcon size={14}/>} 
+              label={project.name} 
+              active={pathname === `/projects/${project.id}`}
+              href={`/projects/${project.id}`}
+            />
+          ))}
         </motion.div>
       </div>
 

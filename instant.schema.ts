@@ -23,8 +23,32 @@ const _schema = i.schema({
       title: i.string().optional(),
       url: i.string().optional(),
     }),
+    projects: i.entity({
+      name: i.string(),
+      createdAt: i.date().indexed(),
+    }),
+    experiments: i.entity({
+      name: i.string(),
+      url: i.string(),
+      bookmarkedAt: i.date().optional(),
+      createdAt: i.date().indexed(),
+    }),
+    chatMessages: i.entity({
+      message: i.string(),
+      role: i.string(),
+      createdAt: i.date().indexed(),
+    }),
   },
-  links: {},
+  links: {
+    projectExperiments: {
+      forward: { on: 'projects', has: 'many', label: 'experiments' },
+      reverse: { on: 'experiments', has: 'one', label: 'project' }
+    },
+    experimentChatMessages: {
+      forward: { on: 'experiments', has: 'many', label: 'chatMessages' },
+      reverse: { on: 'chatMessages', has: 'one', label: 'experiment' }
+    },
+  },
   rooms: {},
 });
 
