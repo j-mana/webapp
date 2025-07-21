@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const { messages, experimentId } = await req.json();
 
   const {text} = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4o'),
     system: 'You are a generative UX platform for marketing teams to run experiments. Your name is Manafold AI.',
     messages,
   });
