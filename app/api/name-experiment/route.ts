@@ -1,13 +1,8 @@
 import OpenAI from "openai";
-import { init } from "@instantdb/admin";
 import { NextRequest, NextResponse } from "next/server";
-
-// ID for app: Manafold
-const APP_ID = '3a4c7162-eb2c-49f3-a422-1c0f6b4ba430';
-const db = init({
-  appId: APP_ID,
-  adminToken: process.env.INSTANT_APP_ADMIN_TOKEN!,
-});
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { generateId } from "@/lib/supabase";
+import { DateTime } from "luxon";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -58,9 +53,12 @@ export async function POST(req: NextRequest) {
   const args = JSON.parse(toolCall.function.arguments);
   const experimentName = args.name;
 
-  await db.transact(db.tx.experiments[experimentId].update({
-    name: experimentName,
-  }));
+  await supabaseAdmin
+    .from('experiments')
+    .update({
+      name: experimentName,
+    })
+    .eq('id', experimentId);
 
   return NextResponse.json({ name: experimentName });
 }

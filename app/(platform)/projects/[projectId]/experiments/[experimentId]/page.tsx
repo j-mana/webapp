@@ -29,9 +29,14 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSidebarVisible, setIsSidebarVisible] = useState(true)
   
-  const { experiments } = useData()
+  const { experiments, refreshData } = useData()
   const experiment = experiments.find((experiment) => experiment.id === experimentId)
-  const chatMessages = experiment?.chatMessages || []
+  const chatMessages = experiment?.chat_messages || []
+
+  // Debug logging
+  console.log('🔍 Current experiment:', experiment?.name)
+  console.log('🔍 Chat messages count:', chatMessages.length)
+  console.log('🔍 Latest messages:', chatMessages.slice(-2))
 
   const handleSend = async () => {
     if (!chatInput.trim() || isLoading) return;

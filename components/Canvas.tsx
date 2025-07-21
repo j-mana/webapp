@@ -65,8 +65,8 @@ export default function Canvas() {
   );
 
   const canvasNodes = useMemo(() => 
-    experiment?.canvasNodes || [], 
-    [experiment?.canvasNodes]
+    experiment?.canvas_nodes || [], 
+    [experiment?.canvas_nodes]
   );
 
   // Update nodes only when canvas nodes actually change

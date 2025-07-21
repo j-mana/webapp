@@ -22,7 +22,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const [bookmarksExpanded, setBookmarksExpanded] = useState(true)
   const [projectsExpanded, setProjectsExpanded] = useState(true)
-  const { projects, experiments } = useData()
+  const { projects, experiments, refreshData } = useData()
   
   // Calculate activeProject based on pathname
   const getActiveProjectIndex = () => {
@@ -133,7 +133,12 @@ export default function Sidebar() {
         </button>
 
         <Button variant="normal" className="w-full" onClick={async () => {
-          await createProject('New Project')
+          try {
+            await createProject('New Project')
+            refreshData() // Refresh the data to show the new project
+          } catch (error) {
+            console.error('Failed to create project:', error)
+          }
         }}>
           {/* <PlusIcon size={14}/> */}
           New Project

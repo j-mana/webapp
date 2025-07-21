@@ -1,13 +1,10 @@
-import { id, init } from '@instantdb/admin';
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { generateId } from "@/lib/supabase";
 import { DateTime } from 'luxon';
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer'
 // ID for app: Manafold
 const APP_ID = '3a4c7162-eb2c-49f3-a422-1c0f6b4ba430';
-const db = init({
-  appId: APP_ID,
-  adminToken: process.env.INSTANT_APP_ADMIN_TOKEN!,
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,9 +51,9 @@ export async function POST(request: NextRequest) {
     const screenshotBase64 = (screenshot as Buffer).toString('base64')
     const screenshotDataUrl = `data:image/png;base64,${screenshotBase64}`
 
-    const nodeId = id()
-    await db.transact(
-      db.tx.canvasNodes[nodeId]
+    const nodeId = generateId()
+    await supabaseAdmin
+      .from('canvas_nodes')
         .update({
           type: 'screenshot',
           x: 100,
@@ -67,10 +64,10 @@ export async function POST(request: NextRequest) {
             screenshot: screenshotDataUrl,
             url: fullUrl,
           },
-        createdAt: DateTime.now(),
-      })
-      .link({ experiment: experimentId })
-    )
+      created_at: DateTime.now().toISO(),
+    })
+    .eq('id', nodeId)
+    .eq('experiment_id', experimentId)
 
     return NextResponse.json({
       success: true,

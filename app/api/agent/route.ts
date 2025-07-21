@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai";
-import { init, id } from "@instantdb/admin";
-import { DateTime } from "luxon";
-
-// ID for app: Manafold
-const APP_ID = '3a4c7162-eb2c-49f3-a422-1c0f6b4ba430';
-const db = init({
-  appId: APP_ID,
-  adminToken: process.env.INSTANT_APP_ADMIN_TOKEN!,
-});
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { generateId } from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -30,14 +23,16 @@ export async function POST(req: NextRequest) {
 
   const text = completion.choices[0].message.content;
 
-  const messageId = id();
-  await db.transact(
-    db.tx.chatMessages[messageId].update({
+  const messageId = generateId();
+  await supabaseAdmin
+    .from('chat_messages')
+    .insert({
+      id: messageId,
       role: 'assistant',
       message: text,
-      createdAt: DateTime.now().toISO(),
-    }).link({ experiment: experimentId })
-  );
+      experiment_id: experimentId,
+      created_at: Date.now(),
+    });
 
   return NextResponse.json({ text });
 }

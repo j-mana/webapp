@@ -1,125 +1,138 @@
-import { db, id } from './db'
+import { db, generateId } from './db'
 
 // Project mutations
 export async function createProject(name: string) {
-  const projectId = id()
-  await db.transact(
-    db.tx.projects[projectId].update({
+  const projectId = generateId()
+  const { error } = await db
+    .from('projects')
+    .insert({
+      id: projectId,
       name,
-      createdAt: Date.now(), // Use Date.now() for timestamp numbers
+      created_at: Date.now(),
     })
-  )
+  
+  if (error) {
+    console.error('Create project error:', error)
+    throw new Error(`Failed to create project: ${error.message || error.details || error.hint || 'Unknown database error'}`)
+  }
+  
   return projectId
 }
 
 export async function updateProject(projectId: string, updates: { name?: string }) {
-  await db.transact(
-    db.tx.projects[projectId].update(updates)
-  )
+  const { error } = await db
+    .from('projects')
+    .update(updates)
+    .eq('id', projectId)
+  
+  if (error) {
+    console.error('Update project error:', error)
+    throw new Error(`Failed to update project: ${error.message || error.details || 'Unknown database error'}`)
+  }
 }
 
 export async function deleteProject(projectId: string) {
-  // Delete all experiments associated with the project first
-  const { data } = await db.queryOnce({
-    experiments: {
-      $: {
-        where: { 'project.id': projectId }
-      }
-    }
-  })
+  // Supabase will handle cascading deletes automatically due to ON DELETE CASCADE
+  const { error } = await db
+    .from('projects')
+    .delete()
+    .eq('id', projectId)
   
-  if (data?.experiments) {
-    const deleteTxs = data.experiments.map(exp => 
-      db.tx.experiments[exp.id].delete()
-    )
-    if (deleteTxs.length > 0) {
-      await db.transact(deleteTxs)
-    }
+  if (error) {
+    console.error('Delete project error:', error)
+    throw new Error(`Failed to delete project: ${error.message || error.details || 'Unknown database error'}`)
   }
-  
-  // Then delete the project
-  await db.transact(
-    db.tx.projects[projectId].delete()
-  )
 }
 
 // Experiment mutations
 export async function createExperiment(projectId: string, name: string, url: string) {
-  const experimentId = id()
-  await db.transact(
-    db.tx.experiments[experimentId]
-      .update({
-        name,
-        url,
-        createdAt: Date.now(), // Use Date.now() for timestamp numbers
-      })
-      .link({ project: projectId })
-  )
+  const experimentId = generateId()
+  const { error } = await db
+    .from('experiments')
+    .insert({
+      id: experimentId,
+      name,
+      url,
+      created_at: Date.now(),
+      project_id: projectId,
+    })
+  
+  if (error) {
+    console.error('Create experiment error:', error)
+    throw new Error(`Failed to create experiment: ${error.message || error.details || 'Unknown database error'}`)
+  }
+  
   return experimentId
 }
 
 export async function updateExperiment(experimentId: string, updates: { name?: string, url?: string }) {
-  await db.transact(
-    db.tx.experiments[experimentId].update(updates)
-  )
+  const { error } = await db
+    .from('experiments')
+    .update(updates)
+    .eq('id', experimentId)
+  
+  if (error) {
+    console.error('Update experiment error:', error)
+    throw new Error(`Failed to update experiment: ${error.message || error.details || 'Unknown database error'}`)
+  }
 }
 
 export async function deleteExperiment(experimentId: string) {
-  // Delete all chat messages associated with the experiment first
-  const { data } = await db.queryOnce({
-    chatMessages: {
-      $: {
-        where: { 'experiment.id': experimentId }
-      }
-    }
-  })
+  // Supabase will handle cascading deletes automatically due to ON DELETE CASCADE
+  const { error } = await db
+    .from('experiments')
+    .delete()
+    .eq('id', experimentId)
   
-  if (data?.chatMessages) {
-    const deleteTxs = data.chatMessages.map(msg => 
-      db.tx.chatMessages[msg.id].delete()
-    )
-    if (deleteTxs.length > 0) {
-      await db.transact(deleteTxs)
-    }
+  if (error) {
+    console.error('Delete experiment error:', error)
+    throw new Error(`Failed to delete experiment: ${error.message || error.details || 'Unknown database error'}`)
   }
-  
-  // Then delete the experiment
-  await db.transact(
-    db.tx.experiments[experimentId].delete()
-  )
 }
 
 // Chat message mutations
 export async function addChatMessage(experimentId: string, message: string, role: 'user' | 'assistant') {
-  const messageId = id()
-  await db.transact(
-    db.tx.chatMessages[messageId]
-      .update({
-        message,
-        role,
-        createdAt: Date.now(),
-      })
-      .link({ experiment: experimentId })
-  )
+  const messageId = generateId()
+  const { error } = await db
+    .from('chat_messages')
+    .insert({
+      id: messageId,
+      message,
+      role,
+      created_at: Date.now(),
+      experiment_id: experimentId,
+    })
+  
+  if (error) {
+    console.error('Add chat message error:', error)
+    throw new Error(`Failed to add chat message: ${error.message || error.details || 'Unknown database error'}`)
+  }
+  
   return messageId
 }
 
 // Canvas node mutations
 export async function createCanvasNode(experimentId: string, type: string, x: number, y: number, data: any, width?: number, height?: number) {
-  const nodeId = id()
-  await db.transact(
-    db.tx.canvasNodes[nodeId]
-      .update({
-        type,
-        x,
-        y,
-        width,
-        height,
-        data,
-        createdAt: Date.now(),
-      })
-      .link({ experiment: experimentId })
-  )
+  const nodeId = generateId()
+  const { error } = await db
+    .from('canvas_nodes')
+    .insert({
+      id: nodeId,
+      type,
+      x,
+      y,
+      width,
+      height,
+      data,
+      created_at: Date.now(),
+      experiment_id: experimentId,
+    })
+  
+  if (error) {
+    console.error('Create canvas node error:', error)
+    throw new Error(`Failed to create canvas node: ${error.message || error.details || 'Unknown database error'}`)
+  }
+  
   return nodeId
 }
 
