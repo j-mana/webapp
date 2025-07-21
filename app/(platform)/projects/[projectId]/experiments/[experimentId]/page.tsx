@@ -13,10 +13,10 @@ import { addChatMessage } from '@/lib/db-mutations'
 import { useParams } from 'next/navigation'
 import { useData } from '@/components/DataProvider'
 import ChatMessage from '@/components/ChatMessage'
-import { useChat } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
 import CursorBoxIcon from '@/icons/CursorBoxIcon'
+import Analytics from '@/components/Analytics'
 
 
 export default function App() {
@@ -25,23 +25,47 @@ export default function App() {
   const [activeMainTab, setActiveMainTab] = useState('chat')
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('edit')
   const [chatInput, setChatInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   
-
   const { experiments } = useData()
   const experiment = experiments.find((experiment) => experiment.id === experimentId)
   const chatMessages = experiment?.chatMessages || []
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/agent',
-    body: {
-      messages: chatMessages,
-    },
-  });
-
   const handleSend = async () => {
-    await addChatMessage(experimentId, chatInput, 'user')
-    setChatInput('')
-  }
+    if (!chatInput.trim() || isLoading) return;
+    
+    const userMessage = chatInput;
+    setChatInput('');
+    setIsLoading(true);
+    
+    try {
+      // Add user message to database
+      await addChatMessage(experimentId, userMessage, 'user');
+      
+      // Send to API (which will create the assistant message in the database)
+      const response = await fetch('/api/agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...chatMessages, { role: 'user', content: userMessage }].map(msg => ({
+            role: msg.role,
+            content: 'message' in msg ? msg.message : msg.content
+          })),
+          experimentId: experimentId
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const mainTabs = [
     { id: 'chat', label: 'Chat', icon: <ChatIcon size={14}/> },
@@ -67,14 +91,25 @@ export default function App() {
 
             {activeMainTab === 'chat' && (
               <>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-4 flex-1 overflow-y-auto'>
                 {chatMessages.map((message) => (
                   <ChatMessage key={message.id} message={message.message} role={message.role as 'user' | 'assistant'} />
                 ))}
+                {isLoading && (
+                  <div className='flex items-center gap-2 p-2'>
+                    <div className='w-1 h-1 bg-gray-400 rounded-full animate-pulse'></div>
+                    <div className='w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-75'></div>
+                    <div className='w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-150'></div>
+                  </div>
+                )}
               </div>
 
-
-              <ChatInput recommendationsLocation="top" input={chatInput} setInput={setChatInput} onSend={handleSend} />
+              <ChatInput 
+                recommendationsLocation="top" 
+                input={chatInput} 
+                setInput={setChatInput} 
+                onSend={handleSend} 
+              />
               </>
             )}
 
@@ -103,8 +138,12 @@ export default function App() {
                 onTabChange={setActiveSecondaryTab}
               />
             </div>
-            <div className='h-full w-full bg-gray-50'>
-              <Canvas />
+            <div className={`h-full w-full ${activeSecondaryTab === 'edit' ? 'bg-gray-50' : 'bg-white'}`}>
+              {activeSecondaryTab === 'edit' ? (
+                <Canvas />
+              ) : (
+                <Analytics />
+              )}
             </div>
           </div>
         </div>

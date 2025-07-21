@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 interface Tab {
   id: string
   label: string
-  icon: React.ReactNode
+  icon?: React.ReactNode
 }
 
 interface TabGroupProps {

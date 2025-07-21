@@ -62,11 +62,11 @@ export default function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <SidebarItem icon={<HomeIcon size={14}/>} label="Home"/>
-        <SidebarItem icon={<UserIcon size={14}/>} label="Customers"/>
-        <SidebarItem icon={<CubeIcon size={14}/>} label="Brand"/>
-        <SidebarItem icon={<CodeIcon size={14}/>} label="API"/>
-        <SidebarItem icon={<SearchIcon size={14}/>} label="Search"/>
+        <SidebarItem icon={<HomeIcon size={14}/>} label="Home" href="/"/>
+        <SidebarItem icon={<UserIcon size={14}/>} label="Customers" href="/customers"/>
+        <SidebarItem icon={<CubeIcon size={14}/>} label="Brand" href="/brand"/>
+        <SidebarItem icon={<CodeIcon size={14}/>} label="API" href="/api_docs"/>
+        <SidebarItem icon={<SearchIcon size={14}/>} label="Search" href="/search"/>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -181,12 +181,12 @@ export default function Sidebar() {
   )
 }
 
-const SidebarItem = ({icon, label}: {icon: React.ReactNode, label: string}) => {
+const SidebarItem = ({icon, label, href}: {icon: React.ReactNode, label: string, href?: string}) => {
   return (
-    <div className="flex flex-row gap-2 items-center text-text-primary">
+    <Link href={href || ''} className="flex flex-row gap-2 items-center text-text-primary">
       {icon}  
       <p className="text-sm font-medium text-text-primary">{label}</p>
-    </div>
+    </Link>
   )
 }
 
