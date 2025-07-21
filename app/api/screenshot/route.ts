@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     await browser.close()
 
     // Convert screenshot to base64
-    const screenshotBase64 = screenshot.toString('base64')
+    const screenshotBase64 = Buffer.from(screenshot).toString('base64')
     const screenshotDataUrl = `data:image/png;base64,${screenshotBase64}`
 
     return NextResponse.json({

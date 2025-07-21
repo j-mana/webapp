@@ -25,18 +25,18 @@ const _schema = i.schema({
     }),
     projects: i.entity({
       name: i.string(),
-      createdAt: i.date().indexed(),
+      createdAt: i.number().indexed(), // IMPORTANT: Use i.number() for timestamps, not i.date()
     }),
     experiments: i.entity({
       name: i.string(),
       url: i.string(),
-      bookmarkedAt: i.date().optional(),
-      createdAt: i.date().indexed(),
+      bookmarkedAt: i.number().optional(), // IMPORTANT: Use i.number() for timestamps, not i.date()
+      createdAt: i.number().indexed(), // IMPORTANT: Use i.number() for timestamps, not i.date()
     }),
     chatMessages: i.entity({
       message: i.string(),
       role: i.string(),
-      createdAt: i.date().indexed(),
+      createdAt: i.number().indexed(), // IMPORTANT: Use i.number() for timestamps, not i.date()
     }),
     canvasNodes: i.entity({
       type: i.string(), // 'screenshot', 'text', etc.
@@ -45,7 +45,7 @@ const _schema = i.schema({
       width: i.number().optional(),
       height: i.number().optional(),
       data: i.json(), // stores node-specific data like screenshot URL, text content, etc.
-      createdAt: i.date().indexed(),
+      createdAt: i.number().indexed(), // IMPORTANT: Use i.number() for timestamps, not i.date()
     }),
   },
   links: {

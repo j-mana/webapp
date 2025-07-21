@@ -1,5 +1,4 @@
 import { db, id } from './db'
-import { DateTime } from 'luxon'
 
 // Project mutations
 export async function createProject(name: string) {
@@ -7,7 +6,7 @@ export async function createProject(name: string) {
   await db.transact(
     db.tx.projects[projectId].update({
       name,
-      createdAt: DateTime.now().toISO(),
+      createdAt: Date.now(), // Use Date.now() for timestamp numbers
     })
   )
   return projectId
@@ -52,7 +51,7 @@ export async function createExperiment(projectId: string, name: string, url: str
       .update({
         name,
         url,
-        createdAt: DateTime.now().toISO(),
+        createdAt: Date.now(), // Use Date.now() for timestamp numbers
       })
       .link({ project: projectId })
   )

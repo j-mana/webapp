@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
         }),
       },
     },
+    toolChoice: { type: 'tool', toolName: 'nameExperiment' },
   });
 
   const { toolCalls } = await result;
@@ -38,5 +39,5 @@ export async function POST(req: NextRequest) {
     name: toolCalls[0].args.name,
   }));
 
-  return NextResponse.json({ text });
+  return NextResponse.json({ name: toolCalls[0].args.name });
 }
