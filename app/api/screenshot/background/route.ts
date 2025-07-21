@@ -1,6 +1,13 @@
+import { id, init } from '@instantdb/admin';
+import { DateTime } from 'luxon';
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer'
-import { createCanvasNode } from '../../../../lib/db-mutations'
+// ID for app: Manafold
+const APP_ID = '3a4c7162-eb2c-49f3-a422-1c0f6b4ba430';
+const db = init({
+  appId: APP_ID,
+  adminToken: process.env.INSTANT_APP_ADMIN_TOKEN!,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,19 +54,22 @@ export async function POST(request: NextRequest) {
     const screenshotBase64 = (screenshot as Buffer).toString('base64')
     const screenshotDataUrl = `data:image/png;base64,${screenshotBase64}`
 
-    // Create canvas node with screenshot data
-    const nodeId = await createCanvasNode(
-      experimentId,
-      'screenshot',
-      100, // default x position
-      100, // default y position
-      {
-        screenshot: screenshotDataUrl,
-        title,
-        url: fullUrl,
-      },
-      320, // default width
-      200  // default height
+    const nodeId = id()
+    await db.transact(
+      db.tx.canvasNodes[nodeId]
+        .update({
+          type: 'screenshot',
+          x: 100,
+          y: 100,
+          width: 1280,
+          height: 800,
+          data: {
+            screenshot: screenshotDataUrl,
+            url: fullUrl,
+          },
+        createdAt: DateTime.now(),
+      })
+      .link({ experiment: experimentId })
     )
 
     return NextResponse.json({
