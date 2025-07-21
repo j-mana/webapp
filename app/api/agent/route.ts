@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { streamText, generateText } from "ai";
-import { openai } from '@ai-sdk/openai';
+import OpenAI from "openai";
 import { init, id } from "@instantdb/admin";
 import { DateTime } from "luxon";
+
 // ID for app: Manafold
 const APP_ID = '3a4c7162-eb2c-49f3-a422-1c0f6b4ba430';
 const db = init({
@@ -10,14 +10,25 @@ const db = init({
   adminToken: process.env.INSTANT_APP_ADMIN_TOKEN!,
 });
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
+
 export async function POST(req: NextRequest) {
   const { messages, experimentId } = await req.json();
 
-  const {text} = await generateText({
-    model: openai('gpt-4o'),
-    system: 'You are a generative UX platform for marketing teams to run experiments. Your name is Manafold AI.',
-    messages,
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: "You are a generative UX platform for marketing teams to run experiments. Your name is Manafold AI."
+      },
+      ...messages
+    ],
   });
+
+  const text = completion.choices[0].message.content;
 
   const messageId = id();
   await db.transact(
