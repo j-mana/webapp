@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
 import CursorBoxIcon from '@/icons/CursorBoxIcon'
 import Analytics from '@/components/Analytics'
+import SidebarIcon from '@/icons/SidebarIcon'
 
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('edit')
   const [chatInput, setChatInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true)
   
   const { experiments } = useData()
   const experiment = experiments.find((experiment) => experiment.id === experimentId)
@@ -82,7 +84,8 @@ export default function App() {
       <Header />
       <div className='flex flex-1 overflow-hidden'>
         <div className='flex flex-row h-full w-full'>
-          <div className='p-4 flex flex-col w-96 min-w-96'>
+          <div className={`p-4 h-full flex flex-col transition-all duration-300 ease-in-out ${isSidebarVisible ? 'w-96 min-w-96' : 'flex-1 justify-center items-center'}`}>
+            <div className={`${isSidebarVisible ? 'w-full' : 'w-full max-w-2xl'} flex flex-col h-full`}>
             <TabGroup 
               tabs={mainTabs}
               defaultTab="chat"
@@ -91,7 +94,7 @@ export default function App() {
 
             {activeMainTab === 'chat' && (
               <>
-              <div className='flex flex-col gap-4 flex-1 overflow-y-auto'>
+              <div className='flex flex-col gap-4 shrink-0 h-full flex-1 overflow-y-auto'>
                 {chatMessages.map((message) => (
                   <ChatMessage key={message.id} message={message.message} role={message.role as 'user' | 'assistant'} />
                 ))}
@@ -129,22 +132,40 @@ export default function App() {
               </motion.div>
             )}
 
+            </div>
           </div>
-          <div className='overflow-auto h-full w-full border border-border-light rounded-tl-xl divide-y divide-border-light'>
-            <div className='flex flex-row gap-2 items-center w-full bg-canvas px-4 py-2 sticky top-0 z-10'>
-              <TabGroup 
-                tabs={secondaryTabs}
-                defaultTab="edit"
-                onTabChange={setActiveSecondaryTab}
-              />
-            </div>
-            <div className={`h-full w-full ${activeSecondaryTab === 'edit' ? 'bg-gray-50' : 'bg-white'}`}>
-              {activeSecondaryTab === 'edit' ? (
-                <Canvas />
-              ) : (
-                <Analytics />
-              )}
-            </div>
+          <AnimatePresence>
+            {isSidebarVisible && (
+            <motion.div 
+              layout
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className='overflow-auto h-full w-full border border-border-light rounded-tl-xl divide-y divide-border-light'
+            >
+              <div className='flex flex-row gap-2 items-center w-full bg-canvas px-4 py-2 sticky top-0 z-10'>
+                <TabGroup 
+                  tabs={secondaryTabs}
+                  defaultTab="edit"
+                  onTabChange={setActiveSecondaryTab}
+                />
+              </div>
+              <div className={`h-full w-full ${activeSecondaryTab === 'edit' ? 'bg-gray-50' : 'bg-white'}`}>
+                {activeSecondaryTab === 'edit' ? (
+                  <Canvas />
+                ) : (
+                  <Analytics />
+                )}
+              </div>
+            </motion.div>
+          )}
+          </AnimatePresence>
+          <div 
+            className="absolute bottom-4 right-4 h-8 w-8 bg-white rounded-md border border-border-light strong-shadow z-50 flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+            onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+          >
+            <SidebarIcon size={16} className={`text-gray-400 transition-transform duration-200 ${isSidebarVisible ? 'rotate-180' : ''}`} />
           </div>
         </div>
       </div>

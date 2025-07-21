@@ -38,6 +38,15 @@ const _schema = i.schema({
       role: i.string(),
       createdAt: i.date().indexed(),
     }),
+    canvasNodes: i.entity({
+      type: i.string(), // 'screenshot', 'text', etc.
+      x: i.number(),
+      y: i.number(),
+      width: i.number().optional(),
+      height: i.number().optional(),
+      data: i.json(), // stores node-specific data like screenshot URL, text content, etc.
+      createdAt: i.date().indexed(),
+    }),
   },
   links: {
     projectExperiments: {
@@ -47,6 +56,10 @@ const _schema = i.schema({
     experimentChatMessages: {
       forward: { on: 'experiments', has: 'many', label: 'chatMessages' },
       reverse: { on: 'chatMessages', has: 'one', label: 'experiment' }
+    },
+    experimentCanvasNodes: {
+      forward: { on: 'experiments', has: 'many', label: 'canvasNodes' },
+      reverse: { on: 'canvasNodes', has: 'one', label: 'experiment' }
     },
   },
   rooms: {},

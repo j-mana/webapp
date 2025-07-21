@@ -103,4 +103,66 @@ export async function addChatMessage(experimentId: string, message: string, role
       .link({ experiment: experimentId })
   )
   return messageId
+}
+
+// Canvas node mutations
+export async function createCanvasNode(experimentId: string, type: string, x: number, y: number, data: any, width?: number, height?: number) {
+  const nodeId = id()
+  await db.transact(
+    db.tx.canvasNodes[nodeId]
+      .update({
+        type,
+        x,
+        y,
+        width,
+        height,
+        data,
+        createdAt: Date.now(),
+      })
+      .link({ experiment: experimentId })
+  )
+  return nodeId
+}
+
+export async function createScreenshotNode(experimentId: string, url: string) {
+  try {
+    // Take screenshot
+    const apiUrl = typeof window !== 'undefined' 
+      ? '/api/screenshot' 
+      : `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/screenshot`;
+      
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to take screenshot')
+    }
+
+    const { screenshot, title } = await response.json()
+
+    // Create canvas node with screenshot data
+    const nodeId = await createCanvasNode(
+      experimentId,
+      'screenshot',
+      100, // default x position
+      100, // default y position
+      {
+        screenshot,
+        title,
+        url: url.startsWith('http') ? url : `https://${url}`,
+      },
+      320, // default width
+      200  // default height
+    )
+
+    return nodeId
+  } catch (error) {
+    console.error('Error creating screenshot node:', error)
+    throw error
+  }
 } 

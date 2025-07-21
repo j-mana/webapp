@@ -20,7 +20,7 @@ const db = init({
 
 export const DataContext = createContext({
   projects: [] as InstaQLEntity<AppSchema, 'projects', { experiments: {} }>[],
-  experiments: [] as InstaQLEntity<AppSchema, 'experiments', { project: {}, chatMessages: {} }>[],
+  experiments: [] as InstaQLEntity<AppSchema, 'experiments', { project: {}, chatMessages: {}, canvasNodes: {} }>[],
   db,
 })
 
@@ -37,7 +37,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     },
     experiments: {
       project: {},
-      chatMessages: {}
+      chatMessages: {},
+      canvasNodes: {}
     },
   }
 

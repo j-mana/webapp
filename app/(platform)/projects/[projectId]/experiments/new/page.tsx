@@ -4,6 +4,7 @@ import ChatInput from "@/components/ChatInput"
 import ChevronRightIcon from "@/icons/ChevronRightIcon"
 import SidebarIcon from "@/icons/SidebarIcon"
 import { addChatMessage, createExperiment } from "@/lib/db-mutations"
+import { createNameExperimentJob, createScreenshotJob } from "@/lib/qstash"
 import { useUIStore } from "@/store/useUIStore"
 import { AnimatePresence, motion } from "motion/react"
 import Link from "next/link"
@@ -22,6 +23,17 @@ export default function NewExperimentPage() {
   const handleNewExperiment = async () => {
     const experimentId = await createExperiment(projectId as string, 'New Experiment', url)
     await addChatMessage(experimentId, goal, 'user')
+
+    // Queue screenshot creation as background job if URL is provided
+    if (url.trim()) {
+      try {
+        await createScreenshotJob(experimentId, url)
+        await createNameExperimentJob(experimentId, goal)
+      } catch (error) {
+        console.error('Failed to queue screenshot job:', error)
+        // Continue even if screenshot queueing fails
+      }
+    }
 
     router.push(`/projects/${projectId}/experiments/${experimentId}`)
   }
@@ -64,7 +76,13 @@ export default function NewExperimentPage() {
           <div className="px-3 py-2 text-xs text-text-secondary border-r border-border-light">
             https://
           </div>
-          <input type="text" className="w-full outline-none text-xs bg-white px-2" placeholder="Enter a page" />
+          <input 
+            type="text" 
+            className="w-full outline-none text-xs bg-white px-2" 
+            placeholder="Enter a page" 
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
         </div>
         <ChatInput recommendationsLocation="bottom" input={goal} setInput={setGoal} onSend={handleNewExperiment} />
       </div>
