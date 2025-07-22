@@ -13,7 +13,7 @@ import { addChatMessage } from '@/lib/db-mutations'
 import { useParams } from 'next/navigation'
 import { useData } from '@/components/DataProvider'
 import ChatMessage from '@/components/ChatMessage'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, LayoutGroup } from 'motion/react'
 import Image from 'next/image'
 import CursorBoxIcon from '@/icons/CursorBoxIcon'
 import Analytics from '@/components/Analytics'
@@ -88,9 +88,19 @@ export default function App() {
     <div className='h-dvh w-full flex flex-col'>
       <Header />
       <div className='flex flex-1 overflow-hidden'>
-        <div className='flex flex-row h-full w-full'>
-          <div className={`p-4 h-full flex flex-col transition-all duration-300 ease-in-out ${isSidebarVisible ? 'w-96 min-w-96' : 'flex-1 justify-center items-center'}`}>
-            <div className={`${isSidebarVisible ? 'w-full' : 'w-full max-w-2xl'} flex flex-col h-full`}>
+                <LayoutGroup>
+          <div className='flex flex-row h-full w-full'>
+            <motion.div 
+              layout
+              layoutId="main-content"
+              className="p-4 h-full flex flex-col min-w-96 shrink-0 flex-1 justify-center items-center"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <motion.div 
+                layout
+                className={`${isSidebarVisible ? 'w-full' : 'w-full max-w-2xl'} flex flex-col h-full`}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
             <TabGroup 
               tabs={mainTabs}
               defaultTab="chat"
@@ -137,16 +147,19 @@ export default function App() {
               </motion.div>
             )}
 
-            </div>
-          </div>
-          <AnimatePresence>
+            </motion.div>
+          </motion.div>
+          <AnimatePresence mode="popLayout">
             {isSidebarVisible && (
             <motion.div 
-              layout
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '100%', opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 30
+              }}
               className='overflow-auto h-full w-full border border-border-light rounded-tl-xl divide-y divide-border-light'
             >
               <div className='flex flex-row gap-2 items-center w-full bg-canvas px-4 py-2 sticky top-0 z-10'>
@@ -173,6 +186,7 @@ export default function App() {
             <SidebarIcon size={16} className={`text-gray-400 transition-transform duration-200 ${isSidebarVisible ? 'rotate-180' : ''}`} />
           </div>
         </div>
+        </LayoutGroup>
       </div>
     </div>
   )

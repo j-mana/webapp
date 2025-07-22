@@ -63,7 +63,6 @@ export default function Sidebar() {
 
       <div className="flex flex-col gap-2">
         <SidebarItem icon={<HomeIcon size={14}/>} label="Home" href="/"/>
-        <SidebarItem icon={<UserIcon size={14}/>} label="Customers" href="/customers"/>
         <SidebarItem icon={<CubeIcon size={14}/>} label="Brand" href="/brand"/>
         <SidebarItem icon={<CodeIcon size={14}/>} label="API" href="/api_docs"/>
         <SidebarItem icon={<SearchIcon size={14}/>} label="Search" href="/search"/>
