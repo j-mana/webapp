@@ -166,7 +166,7 @@ export default function ProjectPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-xs border-r border-border-light">
-                    {new Date(experiment.createdAt).toLocaleDateString()}
+                    {new Date(experiment.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
                     <button className="text-gray-400 hover:text-gray-600">
