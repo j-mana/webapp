@@ -25,16 +25,22 @@ function ScreenshotNode({ data }: { data: any }) {
       <div className="p-2 bg-brand-50 flex flex-row gap-2">
         <p className="text-xs text-brand-500 font-semibold">Variant A</p>
         <p className="text-xs text-brand-500 font-semibold">Desktop</p>
-        <p className="text-xs text-brand-500">Successful</p>
+        <p className="text-xs text-brand-500">{data.loading ? 'Processing...' : 'Successful'}</p>
       </div>
       
-      <div className="h-full rounded overflow-hidden" >
-        {data.screenshot ? (
+      <div className="h-full rounded overflow-hidden bg-gray-50 flex min-h-[400px]" >
+        {!data.screenshot ? (
           <img 
             src={data.screenshot} 
             alt={data.title || data.url}
-            className="h-full"
+            className="h-full w-full object-contain"
           />
+        ) : !data.loading ? (
+          <div className="relative w-full h-full  overflow-hidden min-h-[800px]">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#E8E8E8] via-[#C2C2C2] to-[#E8E8E8] animate-shimmer bg-[length:200%_100%]"></div>
+            {/* Content overlay */}
+          </div>
         ) : (
           <div className="text-gray-400 text-sm">Loading screenshot...</div>
         )}

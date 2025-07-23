@@ -19,6 +19,32 @@ export async function POST(request: NextRequest) {
     // Add https:// if no protocol is specified
     const fullUrl = url.startsWith('http') ? url : `https://${url}`
 
+    // Create the canvas node immediately with loading state
+    const nodeId = generateId()
+    const { error: createError } = await supabaseAdmin
+      .from('canvas_nodes')
+      .insert({
+        id: nodeId,
+        experiment_id: experimentId,
+        type: 'screenshot',
+        x: 100,
+        y: 100,
+        width: 1280,
+        height: 800,
+        data: {
+          screenshot: null,
+          url: fullUrl,
+          loading: true,
+        },
+      })
+
+    if (createError) {
+      console.error('Failed to create canvas node:', createError)
+      return NextResponse.json({ error: 'Failed to create canvas node' }, { status: 500 })
+    }
+
+    console.log("Canvas node created with loading state:", nodeId)
+
     console.log("Starting remote browser...");
     
     // Create Browserbase session
@@ -63,24 +89,20 @@ export async function POST(request: NextRequest) {
     // Convert screenshot to data URL (data is already base64)
     const screenshotDataUrl = `data:image/png;base64,${data}`;
 
-    const nodeId = generateId()
+    // Update the canvas node with the screenshot
     const { data: canvasNodeData, error: canvasNodeError } = await supabaseAdmin
       .from('canvas_nodes')
-      .insert({
-        id: nodeId,
-        experiment_id: experimentId,
-        type: 'screenshot',
-        x: 100,
-        y: 100,
-        width: 1280,
-        height: 800,
+      .update({
         data: {
           screenshot: screenshotDataUrl,
           url: fullUrl,
+          loading: false, // Remove loading flag
         },
       })
+      .eq('id', nodeId)
+      .select()
 
-    console.log("Canvas node created:", canvasNodeData); 
+    console.log("Canvas node updated with screenshot:", canvasNodeData); 
     console.log("Canvas node error:", canvasNodeError); 
 
     return NextResponse.json({

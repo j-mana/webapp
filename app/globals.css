@@ -53,4 +53,18 @@
   background: linear-gradient(180deg, #292929 0%, #0A0A0A 100%);
 }
 
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
 
