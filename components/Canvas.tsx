@@ -29,13 +29,13 @@ function ScreenshotNode({ data }: { data: any }) {
       </div>
       
       <div className="h-full rounded overflow-hidden bg-gray-50 flex min-h-[400px]" >
-        {!data.screenshot ? (
+        {data.screenshot ? (
           <img 
             src={data.screenshot} 
             alt={data.title || data.url}
             className="h-full w-full object-contain"
           />
-        ) : !data.loading ? (
+        ) : data.loading ? (
           <div className="relative w-full h-full  overflow-hidden min-h-[800px]">
             {/* Animated gradient background */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#E8E8E8] via-[#C2C2C2] to-[#E8E8E8] animate-shimmer bg-[length:200%_100%]"></div>
